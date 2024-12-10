@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: install-env
+  namespace: openshift-gitops
+spec:
+  destination:
+    namespace: devops
+    server: 'https://api.cluster-jtj5f.dynamic.redhatworkshops.io:6443' # YOUR OPENSHIFT CLUSTER API SERVER URL
+  project: default
+  source:
+    path: .
+    repoURL: 'git@github.com:waeshalaby/prepare-env-as-code.git'  # GIT REPO INCLUDE ALL SUBs YAMLS
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+

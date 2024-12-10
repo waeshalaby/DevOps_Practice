@@ -1,0 +1,4 @@
+1- On your running OpenShift Cluster install OpenShift gitops operator (ArgoCD)
+2- This git-repo includes all needed YAMLs to install (nexus, gitlab, quay, servicemesh,...etc)
+   https://github.com/waeshalaby/prepare-env-as-code.git
+3- In ArgoCD create application use application.yaml file.

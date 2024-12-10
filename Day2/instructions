@@ -1,0 +1,5 @@
+Original repo: https://github.com/blues-man/vote-app-gitops
+1. Build a simple pipeline using Tekton to execute
+    - clone
+    - build code and Image
+    - update gitops repo to automate deployment using Argocd.
