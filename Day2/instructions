@@ -1,4 +1,5 @@
 Original repo: https://github.com/blues-man/vote-app-gitops
+After we completed day1, successfully install needed tools (tekton,Argocd,nexus,..etc)
 1. Build a simple pipeline using Tekton to execute
     - clone
     - build code and Image
