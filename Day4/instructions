@@ -1,0 +1,13 @@
+After presenting the customer with a basic pipeline, we enhanced it by incorporating static code analysis and image security scanning, introducing additional stages to the original pipeline. Now, the next step is to demonstrate how to monitor deployments using the OpenShift Observability tab. To achieve this, we need to enable the OpenShift Logging stack, which leverages Loki for log aggregation and analysis.
+Install Logging stack:
+RH Docs: https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/logging/cluster-logging-deploying#logging-loki-cli-install_cluster-logging-deploying
+
+Here is the steps:
+1- ODF is up and running on your OCP cluster to be enable to create OBC.
+2- Deploy the Loki Operator from the OpenShift OperatorHub to manage the logging stack.
+3- Define an Object Bucket Claim to provision and manage the S3 bucket that Loki will use for log storage.
+4- Configure a secret(secret-logging-loki-s3.yaml) with the necessary credentials (from above OBC) and access details to enable Loki to connect to the S3 bucket.
+5- Configure Loki Stack(LokiStack.yaml)
+6- Install Red Hat OpenShift Logging operator
+7- create ClusterLogging CR from Logging operator
+8- After successful deployment for all above you will find a new tab under observe named log

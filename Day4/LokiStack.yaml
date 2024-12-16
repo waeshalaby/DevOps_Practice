@@ -1,0 +1,25 @@
+apiVersion: loki.grafana.com/v1
+kind: LokiStack
+metadata:
+  name: lokistack-sample-1
+  namespace: openshift-logging
+spec:
+  hashRing:
+    type: memberlist
+  limits:
+    global:
+      queries:
+        queryTimeout: 8m
+  managementState: Managed
+  size: 1x.small
+  storage:
+    schemas:
+      - effectiveDate: '2022-10-11'
+        version: v12
+    secret:
+      credentialMode: static
+      name: logging-loki-s3  # SECRET NAME
+      type: s3
+  storageClassName: openshift-storage.noobaa.io
+  tenants:
+    mode: openshift-logging
