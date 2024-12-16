@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: vote-app-dev2
+spec:
+  destination:
+    namespace: vote-app-dev
+    server: 'https://kubernetes.default.svc'   # YOUR OPENSHIFT CLUSTER API SERVER URL THIS DEFAULT
+  project: default
+  source:
+    path: environments/dev
+    repoURL: 'https://github.com/waeshalaby/vote-app-gitops.git'  # GIT REPO INCLUDE ALL SUBs YAMLS
+    targetRevision: main
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

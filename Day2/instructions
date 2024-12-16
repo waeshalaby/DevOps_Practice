@@ -3,4 +3,4 @@ After we completed day1, successfully install needed tools (tekton,Argocd,nexus,
 1. Build a simple pipeline using Tekton to execute
     - clone
     - build code and Image
-    - update gitops repo to automate deployment using Argocd.
+    - update gitops repo to automate deployment using Argocd using customize task (Task-git-update-deployment.yaml)
