@@ -1,6 +1,6 @@
 ## **Five Days DevOps Practice**
 
-This repo include five Demos with all details in each demo folder
+This repo include five Demos with all details in each demo folder, follow instruction file on each folder
 
  1. Day1:  Automate Build Environments
  2. Day2: Build e2e pipeline using tekton and ArgoCD
