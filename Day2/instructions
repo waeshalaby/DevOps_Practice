@@ -4,3 +4,4 @@ After we completed day1, successfully install needed tools (tekton,Argocd,nexus,
     - clone
     - build code and Image
     - update gitops repo to automate deployment using Argocd using customize task (Task-git-update-deployment.yaml)
+2. Create webhooks(EventListener.yaml,TT.yaml,TB.yaml), don't do it manually I recommend using Add Trigger trick through main pipeline from 3 dots.

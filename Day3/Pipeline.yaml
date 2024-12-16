@@ -1,0 +1,123 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pipeline-pet-battle-scan
+spec:
+  params:
+    - default: pipelines-vote-api
+      name: APP_NAME
+      type: string
+    - default: 'https://github.com/waeshalaby/pipelines-vote-api.git'
+      name: GIT_REPO
+      type: string
+    - default: master
+      name: GIT_REVISION
+      type: string
+    - default: quay.io/waeshalaby/vote-api
+      name: IMAGE_NAME
+      type: string
+    - default: .
+      name: PATH_CONTEXT
+      type: string
+    - default: 'https://github.com/waeshalaby/vote-app-gitops.git'
+      name: CONFIG_GIT_REPO
+      type: string
+    - default: main
+      name: CONFIG_GIT_REVISION
+      type: string
+  tasks:
+    - name: fetch-repository
+      params:
+        - name: url
+          value: $(params.GIT_REPO)
+        - name: revision
+          value: $(params.GIT_REVISION)
+        - name: deleteExisting
+          value: 'true'
+      taskRef:
+        kind: ClusterTask
+        name: git-clone
+      workspaces:
+        - name: output
+          workspace: source
+    - name: sonar-scan
+      params:
+        - name: sonar-host-url
+          value: 'http://sonarqube-sonarqube.apps.cluster-l5ppx.l5ppx.sandbox2941.opentlc.com'
+        - name: sonar-project-key
+          value: $(params.APP_NAME)
+        - name: sonar-token
+          value: sqa_cecd8818873a50b8e9fb837a39eb0ec407336eb0  # HARD CODED SONAR TOKEN for SIMPLICITY
+        - name: source-dir
+          value: /workspace/source/
+      runAfter:
+        - fetch-repository
+      taskRef:
+        kind: Task
+        name: sonar-scan
+      workspaces:
+        - name: source
+          workspace: source
+    - name: build-and-push
+      params:
+        - name: IMAGE
+          value: $(params.IMAGE_NAME)
+        - name: TLSVERIFY
+          value: 'false'
+        - name: CONTEXT
+          value: $(params.PATH_CONTEXT)
+      runAfter:
+        - sonar-scan
+      taskRef:
+        kind: ClusterTask
+        name: buildah
+      workspaces:
+        - name: source
+          workspace: source
+    - name: scan-image
+      params:
+        - name: rox_central_endpoint
+          value: 'central.stackrox.svc:443'   # MY stackrox URL
+        - name: rox_image
+          value: 'quay.io/stackrox-io/roxctl:4.4.2'
+        - name: image
+          value: $(params.IMAGE_NAME)@$(tasks.build-and-push.results.IMAGE_DIGEST)
+        - name: output_format
+          value: json
+        - name: insecure-skip-tls-verify
+          value: 'true'
+        - name: rox_token_file
+          value: /workspace/rox-api-token-auth/rox_api_token  # I USED MY TOKEN AS WORKSPACE and REFERENCE IT HERE
+      runAfter:
+        - build-and-push
+      taskRef:
+        kind: Task
+        name: rhacs-image-scan
+      workspaces:
+        - name: rox-api-token-auth
+          workspace: rox-api-token-auth
+    - name: git-update-deployment
+      params:
+        - name: GIT_REPOSITORY
+          value: $(params.CONFIG_GIT_REPO)
+        - name: CURRENT_IMAGE
+          value: $(params.IMAGE_NAME)
+        - name: NEW_IMAGE
+          value: $(params.IMAGE_NAME)
+        - name: NEW_DIGEST
+          value: $(tasks.build-and-push.results.IMAGE_DIGEST)
+        - name: KUSTOMIZATION_PATH
+          value: environments/dev
+        - name: GIT_REF
+          value: $(params.CONFIG_GIT_REVISION)
+      runAfter:
+        - scan-image
+      taskRef:
+        kind: Task
+        name: git-update-deployment
+      workspaces:
+        - name: workspace
+          workspace: source
+  workspaces:
+    - name: source
+    - name: rox-api-token-auth   # ACS TOKEN

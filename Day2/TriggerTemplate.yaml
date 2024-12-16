@@ -1,0 +1,45 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: trigger-template-pet-battle-api-8h0p0e
+spec:
+  params:
+    - name: git-revision
+    - name: git-commit-message
+    - name: git-repo-url
+    - name: git-repo-name
+    - name: content-type
+    - name: pusher-name
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1
+      kind: PipelineRun
+      metadata:
+        annotations:
+          pipeline.openshift.io/started-by: admin
+        generateName: pet-battle-api-
+        labels:
+          tekton.dev/pipeline: pet-battle-api
+        namespace: vote-pipelines
+      spec:
+        params:
+          - name: APP_NAME
+            value: $(tt.params.git-repo-name)
+          - name: GIT_REPO
+            value: 'https://github.com/waeshalaby/pipelines-vote-api.git'
+          - name: GIT_REVISION
+            value: master
+          - name: IMAGE_NAME
+            value: quay.io/waeshalaby/vote-api
+          - name: PATH_CONTEXT
+            value: .
+          - name: CONFIG_GIT_REPO
+            value: 'https://github.com/waeshalaby/vote-app-gitops.git'
+          - name: CONFIG_GIT_REVISION
+            value: main
+        pipelineRef:
+          name: pet-battle-api
+        status: null
+        workspaces:
+          - name: workspace
+            persistentVolumeClaim:
+              claimName: vote-api-pvc

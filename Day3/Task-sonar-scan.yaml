@@ -1,0 +1,36 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: sonar-scan
+spec:
+  description: Run SonarQube static code analysis
+  params:
+    - description: SonarQube Server URL
+      name: sonar-host-url
+      type: string
+    - description: SonarQube Project Key
+      name: sonar-project-key
+      type: string
+    - description: SonarQube Authentication Token
+      name: sonar-token
+      type: string
+    - default: /workspace/source
+      description: Directory containing source code
+      name: source-dir
+      type: string
+  steps:
+    - computeResources: {}
+      image: 'sonarsource/sonar-scanner-cli:latest'
+      name: run-sonar-scanner
+      script: |
+        #!/bin/sh
+        #$(params.sonar-project-key)
+        #$(params.source-dir) 
+        sonar-scanner \
+          -Dsonar.projectKey=pet-battle \
+          -Dsonar.sources=. \
+          -Dsonar.exclusions=vendor/** \
+          -Dsonar.host.url=$(params.sonar-host-url) \
+          -Dsonar.login=$(params.sonar-token)
+  workspaces:
+    - name: source

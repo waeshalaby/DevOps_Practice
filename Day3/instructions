@@ -1,0 +1,21 @@
+After we completed day2, doing a simple pipeline we will add more stages introducing sonarqube and ACS
+1- Install sonarqube from this helm repo: https://SonarSource.github.io/helm-chart-sonarqube
+this chart will deploy:
+1- sonarqube deployment
+2- postgresql deploymentConfig
+you can run it manually(use provided YAMLs), or install helm chart will create all needed YAMLs
+
+$ helm repo add sonarqube https://SonarSource.github.io/helm-chart-sonarqube
+$ helm repo update
+$ oc create namespace sonarqube
+$ helm install sonarqube sonarqube/sonarqube \
+    --namespace sonarqube \
+    --set OpenShift.enabled=true \
+    --set postgresql.securityContext.enabled=false \
+    --set OpenShift.createSCC=false \
+    --set postgresql.containerSecurityContext.enabled=false \
+    --set persistence.enabled=true
+3- Install RHACS (https://docs.openshift.com/acs/4.6/welcome/index.html), generate token for acs to add image-scan stage
+4- provision Task-sonar-scan.yaml, this is a customize task to scan your code with sonarqube just pass to it (sonar-host-url, sonar-token)
+5- provision Task-rhacs-image-scan.yaml, this task will scan new generated image using RHACS, just pass ROX_ENDPOINT, and pass your token as a secret for rox-api-token-auth workspace.
+6- provision pipeline.yaml
