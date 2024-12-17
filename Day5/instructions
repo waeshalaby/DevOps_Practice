@@ -1,0 +1,20 @@
+We need to demonstrate complex deployment patterns to the customer using Red Hat Service Mesh, including:
+
+- Canary: Gradually roll out a new version to a small user subset, expanding if successful.
+- A/B Testing: Direct traffic to multiple versions simultaneously to compare performance or usability.
+- Blue-Green: Deploy a new version in parallel, switch traffic after testing and validation.
+
+Enable RH service mesh on my OCP cluster (https://docs.redhat.com/en/documentation/openshift_container_platform/4.16/html/service_mesh/service-mesh-2-x#ossm-create-smcp):
+1. Install Red Hat service mesh operator
+2. Install 2 more operators (Kiali Operator provided by Red Hat, Red Hat OpenShift distributed tracing platform (Tempo))
+3. Create new project istio-system:
+    - In this namespace deploy (ServiceMeshControlPlane).
+    - Create in same ns (ServiceMeshMemberRoll)
+4. Add your project to mesh():
+    - update ServiceMeshMemberRoll with the name of new NS
+5. On the new namespace that was added to ServiceMeshMemberRoll
+    - provision app.yaml
+    - provision gateway.yaml
+    - provision canary.yaml(include destination rules and virtual service) to distribute traffic 90% to v1 and 10% to v2
+    - for A/B just change weight to 50% v1 and 50% v2 through VirtualService
+
